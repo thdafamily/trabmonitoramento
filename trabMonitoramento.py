@@ -52,14 +52,14 @@ def ler_float(mensagem, minimo=0.0, maximo=None):
         try:
             valor = float(input(mensagem))
             if valor < minimo:
-                print(f"  ✗ Valor inválido! Deve ser >= {minimo}.")
+                print(f"  Valor inválido! Deve ser >= {minimo}.")
                 continue
             if maximo is not None and valor > maximo:
-                print(f"  ✗ Valor inválido! Deve ser <= {maximo}.")
+                print(f"  Valor inválido! Deve ser <= {maximo}.")
                 continue
             return valor
         except ValueError:
-            print("  ✗ Digite um número válido.")
+            print("  Digite um número válido.")
 
 def ler_inteiro(mensagem, minimo=0, maximo=None):
     """Lê um int validado dentro do intervalo [minimo, maximo]."""
@@ -67,14 +67,14 @@ def ler_inteiro(mensagem, minimo=0, maximo=None):
         try:
             valor = int(input(mensagem))
             if valor < minimo:
-                print(f"  ✗ Valor inválido! Deve ser >= {minimo}.")
+                print(f"  Valor inválido! Deve ser >= {minimo}.")
                 continue
             if maximo is not None and valor > maximo:
-                print(f"  ✗ Valor inválido! Deve ser <= {maximo}.")
+                print(f"  Valor inválido! Deve ser <= {maximo}.")
                 continue
             return valor
         except ValueError:
-            print("  ✗ Digite um número inteiro válido.")
+            print("  Digite um número inteiro válido.")
 
 
 # ══════════════════════════════════════════════
@@ -104,7 +104,7 @@ def cadastrar_avaliacoes():
                 maximo=31
             )
 
-    print("\n  ✓ Todos os dados cadastrados com sucesso!")
+    print("\n  Todos os dados cadastrados com sucesso!")
 
 
 # ══════════════════════════════════════════════
@@ -149,13 +149,86 @@ def listar_relatorio():
 
 
 # ══════════════════════════════════════════════
-#  OPÇÃO 3 – ATUALIZAR DADOS (a implementar)
+#  OPÇÃO 3 – ATUALIZAR DADOS
 # ══════════════════════════════════════════════
 
 def atualizar_dados():
     print("\n>> Opção 3: Atualização de Dados...")
     linha()
-    pass
+
+    # ── Verifica se há algum dado cadastrado nas matrizes ──
+    dados_existentes = False
+    for i in range(NUM_ALUNOS):
+        for j in range(NUM_MESES):
+            if matriz_gordura[i][j] != 0.0 or matriz_treinos[i][j] != 0:
+                dados_existentes = True
+                break
+        if dados_existentes:
+            break
+
+    if not dados_existentes:
+        print("\n  Nenhum dado cadastrado ainda.")
+        print("  Use a Opção 1 para cadastrar as avaliações primeiro.")
+        return
+
+    #Exibe os alunos disponíveis (Vetor 1)
+    print("\n Alunos disponíveis:")
+    for i in range (NUM_ALUNOS):
+        print(f"[{i}] {alunos[i]}")
+
+    i = ler_inteiro(
+        f"\n Selecione o índice do aluno (0 a {NUM_ALUNOS - 1}): ",
+        minimo=0,
+        maximo=NUM_ALUNOS - 1
+    )
+
+     # ── Verifica se o aluno escolhido tem ao menos um mês cadastrado ──
+    meses_disponiveis = [
+        j for j in range(NUM_MESES)
+        if matriz_gordura[i][j] != 0.0 or matriz_treinos[i][j] != 0
+    ]
+
+    #Exibe os alunos disponíveis (Vetor 2)
+    print(f"\n Aluno selecionado: {alunos[i]}")
+    print(f"\n Meses disponíveis:")
+    for j in range(NUM_MESES):
+        print(f"\ [{j}] {meses[j]}")
+
+    j = ler_inteiro(
+        f"\n Selecione o índice do mês (0 a {NUM_MESES - 1}): ",
+        minimo=0,
+        maximo=NUM_MESES - 1
+    )
+
+    # Revalida se o índice digitado realmente tem dados
+    if j not in meses_disponiveis:
+        print(f"\n  {meses[j]} não possui dados cadastrados para {alunos[i]}.")
+        print("  Use a Opção 1 para cadastrar as avaliações primeiro.")
+        return
+
+    #Exibe os valores atuais antes de atualizar
+    print(f"\n  >> Atualizando: {alunos[i]}  |  {meses[j]}")
+    print(f"  (Matriz[{i}][{j}])")
+    print(f"\n  Valores atuais:")
+    print(f"    Percentual de gordura : {matriz_gordura[i][j]:.1f}%")
+    print(f"    Quantidade de treinos : {matriz_treinos[i][j]}")
+
+    print("\n Digite os novos valores:")
+
+    matriz_gordura[i][j] = ler_float(
+        " Novo percentual de gordura (0.0 a 100.0): ",
+        minimo=0,
+        maximo=100.0
+    )
+
+    matriz_treinos[i][j] = ler_inteiro(
+        " Nova quantidade de treinos (0 a 31): ",
+        minimo=0,
+        maximo=31
+    )
+
+
+    print(f"\n Dados de {alunos[i]} no {meses[j]} atualizados!")
 
 
 # ══════════════════════════════════════════════
@@ -165,7 +238,51 @@ def atualizar_dados():
 def pesquisa_filtro():
     print("\n>> Opção 4: Pesquisa Gerencial...")
     linha()
-    pass
+
+    # ── Verifica se há algum dado cadastrado ──
+    dados_existentes = False
+    for i in range(NUM_ALUNOS):
+        for j in range(NUM_MESES):
+            if matriz_treinos[i][j] != 0:
+                dados_existentes = True
+                break
+        if dados_existentes:
+            break
+
+    if not dados_existentes:
+        print("\n  Nenhum dado cadastrado ainda.")
+        print("  Use a Opção 1 para cadastrar as avaliações primeiro.")
+        return
+    
+    # ── Solicita o mês para filtro (Vetor 2) ──
+    print("\n  Meses disponíveis:")
+    for j in range(NUM_MESES):
+        print(f"  [{j}] {meses[j]}")
+
+    j = ler_inteiro(
+        f"\n  Selecione o mês para consultar (0 a {NUM_MESES - 1}): ",
+        minimo=0,
+        maximo=NUM_MESES - 1
+    )
+
+    # ── Verifica se o mês escolhido tem dados ──
+    alunos_no_mes = [
+        i for i in range(NUM_ALUNOS)
+        if matriz_treinos[i][j] != 0
+    ]
+
+    if not alunos_no_mes:
+        print(f"\n  Nenhum dado cadastrado para {meses[j]}.")
+        print("  Use a Opção 1 para cadastrar as avaliações primeiro.")
+        return
+
+    # ── Ordena os alunos do maior para o menor número de treinos ──
+    ranking = sorted(alunos_no_mes, key=lambda i: matriz_treinos[i][j], reverse=True)
+
+    # ── Destaque do campeão ──
+    campeao = ranking[0]
+    print(f"\n  Maior frequência: {alunos[campeao]} com {matriz_treinos[campeao][j]} treinos em {meses[j]}!")
+    print()
 
 
 # ══════════════════════════════════════════════
